@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
-	"os/signal"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -21,7 +19,7 @@ type SQSLocalstack struct {
 }
 
 // setup the data by collecting from args parameter
-func (s *SQSLocalstack) setup() {
+func (s *SQSLocalstack) Setup() {
 	region := flag.String("r", "us-east-1", "The region of localstack. Default: us-east-1")
 	queue := flag.String("q", "", "The name of the queue")
 	timeout := flag.Int("t", 5, "How long, in seconds, that the message is hidden from others")
@@ -46,7 +44,7 @@ func (s *SQSLocalstack) setup() {
 	s.localstackURL = *localstackURL
 }
 
-func (s *SQSLocalstack) receiveSQSMessage() error {
+func (s *SQSLocalstack) ReceiveSQSMessage() error {
 	ctx := context.TODO()
 
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
@@ -122,10 +120,11 @@ func (s *SQSLocalstack) receiveSQSMessage() error {
 	return nil
 }
 
+/*
 func main() {
 	sqsLocalstack := SQSLocalstack{}
 
-	sqsLocalstack.setup()
+	sqsLocalstack.Setup()
 
 	fmt.Println("Start listen incoming message")
 	quit := make(chan os.Signal, 1)
@@ -136,10 +135,11 @@ func main() {
 			fmt.Println("app stopped")
 			os.Exit(0)
 		default:
-			err := sqsLocalstack.receiveSQSMessage()
+			err := sqsLocalstack.ReceiveSQSMessage()
 			if err != nil {
 				os.Exit(1)
 			}
 		}
 	}
 }
+*/
