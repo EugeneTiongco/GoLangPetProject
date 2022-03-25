@@ -2,6 +2,7 @@ package sqs_receive_message
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 
@@ -16,6 +17,12 @@ type SQSLocalstack struct {
 	queueName      string
 	timeoutSeconds int
 	localstackURL  string
+}
+
+type Message struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 // setup the data by collecting from args parameter
@@ -99,10 +106,21 @@ func (s *SQSLocalstack) ReceiveSQSMessage() error {
 	if msgResult != nil {
 		messages := msgResult.Messages
 		if len(messages) > 0 {
+			var result Message
 			msg := messages[0]
 			fmt.Println("Message received")
 			fmt.Println("Message ID:     " + *msg.MessageId)
 			fmt.Println("Message Body: " + *msg.Body)
+
+			err1 := json.Unmarshal([]byte(*msg.Body), &result)
+			if err1 != nil {
+				fmt.Println("failed to unmarshal message")
+			}
+
+			fmt.Println("Unmarshal message: ")
+			fmt.Println("ID: " + result.Id)
+			fmt.Println("Name: " + result.Name)
+			fmt.Println("Status: " + result.Status)
 
 			//delete the message
 			dMInput := &sqs.DeleteMessageInput{
